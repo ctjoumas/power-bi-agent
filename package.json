@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "powerbi-client": "^2.22.3"
+  }
+}

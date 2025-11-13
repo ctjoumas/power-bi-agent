@@ -1,0 +1,13 @@
+var pbilab = {
+	tenantId: "YOUR_TENANT_ID_HERE",
+	clientId: "YOUR_CLIENT_ID_HERE",
+	reportId: "YOUR_REPORT_ID_HERE",
+	userUpn: "YOUR_USER_UPN_HERE",
+	
+	pipeConfig: (config) =>{
+		
+	},
+	bind: (report)=>{
+		
+	}
+};
