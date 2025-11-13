@@ -169,21 +169,27 @@
             // Configuration for backend API
             const API_BASE_URL = 'http://localhost:8000'; // Update this to your backend URL
             
-            // Store conversation history and current page data hash
+            // Store conversation history and current page hash
             let conversationHistory = [];
-            let currentDataHash = null;
+            let currentPageHash = null;
             
             function hashData(data) {
-                // Create a simple hash from the page name and timestamp to detect data changes
+                // Create a simple hash from the page name and timestamp to detect data changes. We probably don't need the timestamp
+                // unless there is another tab with the same name, which probably won't happen.
                 const metadata = data?.reportMetadata || {};
                 return `${metadata.pageName}_${metadata.extractionTimestamp}`;
             }
 
             function displayConversation(containerElement) {
-                // Display the full conversation history
+                // Display the full conversation history (skip system messages)
                 containerElement.innerHTML = '';
                 
                 conversationHistory.forEach((msg, index) => {
+                    // Skip system messages (prompt and data context)
+                    if (msg.role === 'system') {
+                        return;
+                    }
+                    
                     const msgDiv = document.createElement('div');
                     msgDiv.style.marginBottom = '15px';
                     msgDiv.style.padding = '10px';
@@ -225,23 +231,45 @@
                 }
                 
                 // Check if data has changed (new page visited)
-                const newDataHash = hashData(window.currentPageData);
-                if (currentDataHash !== newDataHash) {
-                    // Data changed - clear conversation history to start fresh
+                const newPageHash = hashData(window.currentPageData);
+                if (currentPageHash !== newPageHash) {
+                    // Page changed - clear conversation history to start fresh and remove previous page data so a new conversation can start on the new page;
+                    // we don't want to have data from a previous page interfering with the new page
                     const pageName = window.currentPageData?.reportMetadata?.pageName || 'Unknown';
                     console.log(`New page detected: "${pageName}" - clearing conversation history`);
                     conversationHistory = [];
-                    currentDataHash = newDataHash;
+                    currentPageHash = newPageHash;
                     
                     // Show visual indicator that conversation is starting fresh
-                    const answerSection = document.getElementById('answerSection');
                     answerSection.innerHTML = `<div style="text-align: center; color: #666; font-style: italic; padding: 10px;">Starting new conversation for page: "${pageName}"</div>`;
                     answerSection.style.display = 'block';
                     
                     // Clear after showing briefly
                     setTimeout(() => {
-                        answerSection.innerHTML = '';
+                        answerSection.innerHTML = '<div id="answerText"></div>';
                     }, 2000);
+                }
+                
+                // If this is the first message (empty history), add PowerBI data as context
+                if (conversationHistory.length === 0) {
+                    // Format the PowerBI data for the LLM
+                    const pageName = window.currentPageData?.reportMetadata?.pageName || 'Unknown';
+                    const visuals = window.currentPageData?.visuals || [];
+                    
+                    let dataContext = `PowerBI Report Page: '${pageName}'\n\n`;
+                    visuals.forEach((visual, i) => {
+                        const title = visual.visualTitle || `Visual ${i + 1}`;
+                        const type = visual.visualType || 'unknown';
+                        const data = visual.data || '';
+                        dataContext += `\n### ${title} (${type})\n\`\`\`\n${data}\n\`\`\`\n`;
+                    });
+                    
+                    // Add data as a system message to conversation history
+                    conversationHistory.push({
+                        role: 'system',
+                        content: `Here is the current PowerBI report data:\n\n${dataContext}`,
+                        timestamp: new Date().toISOString()
+                    });
                 }
                 
                 // Add user's question to conversation history
@@ -283,8 +311,12 @@
                         timestamp: new Date().toISOString()
                     });
                     
-                    // Display the answer with conversation context
-                    displayConversation(answerText);
+                    // Re-get answerText in case the DOM was updated
+                    const currentAnswerText = document.getElementById('answerText');
+                    if (currentAnswerText) {
+                        // Display the answer with conversation context
+                        displayConversation(currentAnswerText);
+                    }
                     
                     // Clear the input for next question
                     questionInput.value = '';

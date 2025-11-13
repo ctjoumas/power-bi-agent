@@ -81,18 +81,8 @@ async def ask_question(request: QuestionRequest):
             {"role": "system", "content": get_answer_report_prompt()},
         ]
 
-        # Check if this is the first message in the conversation
-        # If so, add the PowerBI data as context
-        # (Frontend clears messages when page changes, so this handles new page data too)
-        if len(request.messages) == 1:
-            # Add PowerBI data as a structured context message
-            data_context = format_powerbi_data_context(request.data)
-            conversation_messages.append({
-                "role": "system",
-                "content": f"Here is the current PowerBI report data:\n\n{data_context}"
-            })
-
-        # Add all previous conversation messages
+        # Add all conversation messages from frontend
+        # (Frontend adds PowerBI data as first system message on new conversations)
         for msg in request.messages:
             conversation_messages.append({
                 "role": msg.role,
@@ -100,8 +90,15 @@ async def ask_question(request: QuestionRequest):
             })
         
         # Get LLM response
-        answer = await process_with_llm(conversation_messages)
-        
+        response = openai_client.chat.completions.create(
+            model=model_deployment_name,
+            messages=conversation_messages,
+            temperature=0.7,
+            max_completion_tokens=2000
+        )
+
+        answer = response.choices[0].message.content
+
         return QuestionResponse(
             answer=answer,
             confidence=0.95,
@@ -132,32 +129,6 @@ def format_powerbi_data_context(powerbi_data: Dict[str, Any]) -> str:
         context_parts.append(f"```\n{data}\n```")
     
     return "\n".join(context_parts)
-
-
-async def process_with_llm(messages: List[Dict[str, str]]) -> str:
-    """
-    Send the conversation messages to the LLM and get a response.
-    
-    Args:
-        messages: List of message dicts with 'role' and 'content' keys.
-                  Already includes system prompt, data context, and conversation history.
-    
-    Returns:
-        The LLM's response as a string.
-    """
-    try:
-        # Get LLM response
-        response = openai_client.chat.completions.create(
-            model=model_deployment_name,
-            messages=messages,
-            temperature=0.7,
-            max_completion_tokens=2000
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error communicating with LLM: {str(e)}")
-    
-    return response.choices[0].message.content
-
 
 if __name__ == "__main__":
     import uvicorn
