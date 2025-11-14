@@ -85,7 +85,7 @@ python main.py
 
 Backend runs on `http://localhost:8000`
 
-#### Frontend Setup
+#### Running the Front end
 ```bash
 # From repository root
 npx http-server -p 8080
