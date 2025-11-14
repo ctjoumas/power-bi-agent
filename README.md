@@ -88,7 +88,7 @@ Backend runs on `http://localhost:8000`
 #### Running the Front end
 ```bash
 # From repository root
-npx http-server -p 8080
+npx http-server -p 3000
 ```
 
 Open browser to `http://localhost:8080/frontend/index.html`
