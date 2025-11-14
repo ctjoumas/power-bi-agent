@@ -15,7 +15,9 @@ and the Power BI JavaScript SDK for embedding functionality.
    - Provide a name for your application
    - Select "Accounts in this organizational directory only" for supported account types
    - Set Redirect URI type to "Single-page application (SPA)" 
-   - Add your application's redirect URI (e.g., http://localhost:3000)
+   - Add the following Redirects
+      - http://localhost:3000
+      - http://localhost:3000/single-page-report.html
 
 2. **API Permissions**:
    - Add delegated permissions for Power BI Service:
