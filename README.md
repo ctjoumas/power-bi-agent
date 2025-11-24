@@ -15,7 +15,9 @@ and the Power BI JavaScript SDK for embedding functionality.
    - Provide a name for your application
    - Select "Accounts in this organizational directory only" for supported account types
    - Set Redirect URI type to "Single-page application (SPA)" 
-   - Add your application's redirect URI (e.g., http://localhost:3000)
+   - Add the following Redirects
+      - http://localhost:3000
+      - http://localhost:3000/single-page-report.html
 
 2. **API Permissions**:
    - Add delegated permissions for Power BI Service:
@@ -83,10 +85,10 @@ python main.py
 
 Backend runs on `http://localhost:8000`
 
-#### Frontend Setup
+#### Running the Front end
 ```bash
 # From repository root
-npx http-server -p 8080
+npx http-server -p 3000
 ```
 
 Open browser to `http://localhost:8080/frontend/index.html`
