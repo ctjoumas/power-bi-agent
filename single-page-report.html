@@ -252,12 +252,17 @@
                 
                 // If this is the first message (empty history), add PowerBI data as context
                 if (conversationHistory.length === 0) {
-                    // Format the PowerBI data for the LLM
+                    // Format the PowerBI data for the LLM - ONLY include active visuals
                     const pageName = window.currentPageData?.reportMetadata?.pageName || 'Unknown';
-                    const visuals = window.currentPageData?.visuals || [];
+                    const allVisuals = window.currentPageData?.visuals || [];
+                    
+                    // Filter to only active visuals (those visible in the current bookmark view)
+                    const activeVisuals = allVisuals.filter(v => v.active !== false);
+                    
+                    console.log(`\n📤 Sending to LLM: ${activeVisuals.length} active visuals (${allVisuals.length - activeVisuals.length} inactive visuals filtered out)`);
                     
                     let dataContext = `PowerBI Report Page: '${pageName}'\n\n`;
-                    visuals.forEach((visual, i) => {
+                    activeVisuals.forEach((visual, i) => {
                         const title = visual.visualTitle || `Visual ${i + 1}`;
                         const type = visual.visualType || 'unknown';
                         const data = visual.data || '';
@@ -357,12 +362,77 @@
                         return;
                     }
                     
-                    console.log(`📄 Exporting from: "${activePage.displayName}" (${activePage.name})`);
+                    console.log(`Exporting from: "${activePage.displayName}"`);
+                    
+                    // Get bookmark information - I don't think this will actually be useful though
+                    let activeBookmarks = [];
+                    try {
+                        const bookmarksManager = await report.bookmarksManager;
+                        const bookmarks = await bookmarksManager.getBookmarks();
+
+                        console.log(`Available bookmarks: ${bookmarks.length}`);
+                        bookmarks.forEach(bookmark => {
+                            console.log(`   - ${bookmark.displayName}`);
+                        });
+                    } catch (bookmarkError) {
+                        console.log(`⚠️ Could not access bookmarks: ${bookmarkError.message}`);
+                    }
+                    
+                    // Get current page filters and slicer state
+                    let slicerStates = [];
+                    try {
+                        // Get page-level filters
+                        const filters = await activePage.getFilters();
+                        console.log(`\nPage Filters: ${filters.length}`);
+                        filters.forEach(filter => {
+                            console.log(`   - ${filter.target?.table}.${filter.target?.column}: ${filter.filterType}`);
+                        });
+                        
+                        // Get slicers from the page - we'll need to dig more into what these really tell is and if we need them
+                        const pageVisuals = await activePage.getVisuals();
+                        const slicers = pageVisuals.filter(v => v.type === 'slicer');
+                        console.log(`\nSlicers on page: ${slicers.length}`);
+                        
+                        for (const slicer of slicers) {
+                            try {
+                                const slicerState = await slicer.getSlicerState();
+                                console.log(`   - ${slicer.title || slicer.name}: ${JSON.stringify(slicerState.filters)}`);
+                                slicerStates.push({
+                                    title: slicer.title,
+                                    name: slicer.name,
+                                    filters: slicerState.filters
+                                });
+                            } catch (err) {
+                                console.log(`   - ${slicer.title || slicer.name}: Could not get state`);
+                            }
+                        }
+                    } catch (filterError) {
+                        console.log(`⚠️ Could not access filters: ${filterError.message}`);
+                    }
                     
                     statusElement.textContent = `Analyzing visuals on "${activePage.displayName}"...`;
                     const visuals = await activePage.getVisuals();
                     console.log(`   Found ${visuals.length} visuals on this page`);
+                    
+                    // Detect active bookmark buttons (mode:1 = active, mode:0 = inactive)
+                    // Not sure this really matters unless we tie the name of hte bookmark button to the corresponding section (i.e. look at
+                    // the Process Understanding page and the "Source by preparar" bookmark button which shows the corresponding pivotTable of data below)
+                    const activeBookmarkButtons = [];
+                    console.log(`\nBookmark Button States:`);
+                    for (const visual of visuals) {
+                        if (visual.type === 'actionButton' && visual.title) {
+                            const displayMode = visual.layout?.displayState?.mode;
 
+                            // check if this button (bookmark) is active
+                            if (displayMode === 1) {
+                                console.log(`   ✅ ACTIVE: ${visual.title}`);
+                                activeBookmarkButtons.push(visual.title);
+                            } else if (displayMode === 0) {
+                                console.log(`   ⚪ INACTIVE: ${visual.title}`);
+                            }
+                        }
+                    }
+                    
                     const pageData = {
                         pageName: activePage.displayName,
                         pageId: activePage.name,
@@ -372,6 +442,8 @@
                     let skippedCount = 0;
                     let failedCount = 0;
                     
+                    console.log(`    TABLES AND MATRICES:`);
+
                     for (let visualIndex = 0; visualIndex < visuals.length; visualIndex++) {
                         const visual = visuals[visualIndex];
                         
@@ -380,6 +452,26 @@
                         
                         // Skip non-exportable types
                         if (['slicer', 'textbox', 'shape', 'image', 'actionButton'].includes(visual.type)) {
+                            skippedCount++;
+                            continue;
+                        }
+                        
+                        // Check if this visual is part of the active view
+                        const visualName = visual.title || visual.name;
+                        
+                        // Check if visual is hidden (mode:1 = hidden, mode:0 = visible)
+                        const isHidden = visual.layout?.displayState?.mode === 1;
+                        const displayMode = visual.layout?.displayState?.mode;
+                        
+                        // Log export attempt for pivot tables and matrices to understand what we're seeing
+                        if (visual.type === 'pivotTable' || visual.type === 'tableEx') {
+                            const layout = visual.layout || {};
+                            console.log(`      ${visual.title || visual.name} (${visual.type})`);
+                            console.log(`         displayMode: ${displayMode} ${isHidden ? '[HIDDEN]' : '[VISIBLE]'}`);
+                        }
+                        
+                        if (isHidden) {
+                            console.log(`      Skipping hidden visual: ${visual.title || visual.name}`);
                             skippedCount++;
                             continue;
                         }
@@ -414,8 +506,18 @@
                                     visualName: visual.name,
                                     exportMethod: exportMethod,
                                     data: exportedData.data,
-                                    rowCount: exportedData.data.split('\n').length
+                                    rowCount: exportedData.data.split('\n').length,
+                                    active: isHidden  // Flag indicating if this visual is in the active / visible in the bookmark view
                                 };
+                                
+                                // Log preview of exported data for verification
+                                const activeLabel = isHidden ? '✅ ACTIVE' : '⚪ INACTIVE';
+                                console.log(`\n${activeLabel}: ${visual.title || visual.name}`);
+                                console.log(`📄 Data preview (first 300 chars):`);
+                                console.log(exportedData.data.substring(0, 300));
+                                if (exportedData.data.length > 300) {
+                                    console.log(`... (${exportedData.data.length} total characters, ${visualData.rowCount} rows)`);
+                                }
                                 
                                 pageData.visuals.push(visualData);
                             } else {
@@ -440,7 +542,9 @@
                     const finalData = {
                         reportMetadata: {
                             pageName: activePage.displayName,
-                            extractionTimestamp: new Date().toISOString()
+                            extractionTimestamp: new Date().toISOString(),
+                            slicers: slicerStates.length > 0 ? slicerStates : undefined,
+                            activeBookmarkButtons: activeBookmarkButtons.length > 0 ? activeBookmarkButtons : undefined
                         },
                         visuals: pageData.visuals
                     };
@@ -531,6 +635,49 @@
                 report.on('rendered', function() {
                     console.log('Page rendered successfully');
                     document.getElementById('exportCurrentPageBtn').disabled = false;
+                });
+                
+                // Listen for bookmark button clicks to update active flags - this is the button even for when a bookmark is clicked.
+                report.on('buttonClicked', async function(event) {
+                    console.log('\nButton clicked:', event.detail);
+                    
+                    if (!window.currentPageData || !window.currentPageData.visuals) {
+                        console.log('No data exported yet - skipping active flag update');
+                        return;
+                    }
+                    
+                    // Get the button title/name that was clicked
+                    const buttonTitle = event.detail.title || event.detail.name;
+                    console.log(`Button: "${buttonTitle}"`);
+                    
+                    // Update active flags in the stored data
+                    let activatedCount = 0;
+                    let deactivatedCount = 0;
+                    
+                    window.currentPageData.visuals.forEach(visual => {
+                        const visualName = (visual.visualTitle || visual.visualName || '').toLowerCase();
+
+                        // Only update visuals that appear to be bookmark-controlled
+                        const isBookmarkControlled = visualName.includes('matrix') || visualName.includes('table');
+                        
+                        if (isBookmarkControlled) {
+                            const wasActive = visual.active;
+                            
+                            if (visual.active && !wasActive) {
+                                console.log(`   ✅ Activated: ${visual.visualTitle || visual.visualName}`);
+                                activatedCount++;
+                            } else if (!visual.active && wasActive) {
+                                console.log(`   ⚪ Deactivated: ${visual.visualTitle || visual.visualName}`);
+                                deactivatedCount++;
+                            }
+                        }
+                    });
+                    
+                    // Update the metadata to reflect the new active bookmark button
+                    if (window.currentPageData.reportMetadata) {
+                        window.currentPageData.reportMetadata.activeBookmarkButtons = [buttonTitle];
+                        window.currentPageData.reportMetadata.lastBookmarkClick = new Date().toISOString();
+                    }
                 });
                 
                 // Handle any errors
