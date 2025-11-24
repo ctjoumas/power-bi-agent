@@ -470,11 +470,11 @@
                             console.log(`         displayMode: ${displayMode} ${isHidden ? '[HIDDEN]' : '[VISIBLE]'}`);
                         }
                         
-                        if (isHidden) {
-                            console.log(`      Skipping hidden visual: ${visual.title || visual.name}`);
-                            skippedCount++;
-                            continue;
-                        }
+                        //if (isHidden) {
+                        //    console.log(`      Skipping hidden visual: ${visual.title || visual.name}`);
+                        //    skippedCount++;
+                        //    continue;
+                        //}
                         
                         try {
                             // Try to export data
@@ -507,11 +507,11 @@
                                     exportMethod: exportMethod,
                                     data: exportedData.data,
                                     rowCount: exportedData.data.split('\n').length,
-                                    active: isHidden  // Flag indicating if this visual is in the active / visible in the bookmark view
+                                    active: !isHidden  // If NOT hidden (visible), then it's active in current view
                                 };
                                 
                                 // Log preview of exported data for verification
-                                const activeLabel = isHidden ? '✅ ACTIVE' : '⚪ INACTIVE';
+                                const activeLabel = !isHidden ? '✅ ACTIVE' : '⚪ INACTIVE';
                                 console.log(`\n${activeLabel}: ${visual.title || visual.name}`);
                                 console.log(`📄 Data preview (first 300 chars):`);
                                 console.log(exportedData.data.substring(0, 300));
