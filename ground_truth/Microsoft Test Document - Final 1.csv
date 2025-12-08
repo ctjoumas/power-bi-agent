@@ -1,0 +1,158 @@
+GLA Tab,Complexity,Parameters,Question,Expected Answer,Accuracy,Similarity Score,Speed Score,Reliability,Query efficiency,CU Consumption Score,AI Turns / Steps,Domain knowledge,Reference/Citation Score
+Relationship analysis,Simple,"Primary sales, secondary cost of sales",Which period has the largest difference between the primary and secondary selections?,"2023 period 12 has the largest difference between the primary and secondary selections 956,004,306",,,,,,,,,
+Relationship analysis,Simple,"Primary sales, secondary cost of sales",Is the secondary ever larger than the primary?,Yes,,,,,,,,,
+Process understanding,Simple,Analysis period 2024,What amount of revenue was recorded in the analysis period?,"-9,925,116,732",,,,,,,,,
+Process understanding,Simple,"Analysis period 2024, account type revenue",What is the most material source?,"CA-Customer invoices is the most material net credit source (8,306,846,764), while XG - Credit note promotions is the most material net debit source 450,378,288.",,,,,,,,,
+Form 572,Simple,N/A,How many JE lines were processed in the current and prior periods?,"2023 (Prior fiscal year): 1,536,032 lines
+2024 (Current fiscal year): 1,402,460 lines",,,,,,,,,
+Financial statement comparisons,Complex,Analysis period 2024,"Based on the closing balance amount, and with TE set at 80,000,000, solely based on size, which account classes within Revenue should be classified as significant accounts?","""Sales of goods and services"" and ""Other revenues and income"" are likely to be significant as the relatize size of the account (approaching or exceeding TE) makes it possible that it may contain a material misstatement.
+
+This is based on GAM ACCTS 1.1a which states: We begin our determination of significant accounts at the financial statement caption level (balance sheet and income statement). As a starting point, an account with a balance that approaches or exceeds the amount set for tolerable error (TE) is likely to be significant as the relative size of the account makes it possible that it may contain a material misstatement.",,,,,,,,,
+Process understanding,Complex,"Analysis Period 2024, Account Type Revenue, ""How does the activity vary over time by selected dimension"" set to ""Trended"" and ""Source"" selected","Based on TE set at 80,000,000, are there any new material sources identified in Q4?","Yes, there are 3 sources (AA - Invoice to be issued, SA - G/L account document, YA - Invoice manual) with activity greater than an absolute value of 80,000,000 that did not have material activity in the first 9 periods of the year.",,,,,,,,,
+Process understanding,Complex,"Analysis period 2024, Account Class Other revenues and income, ""How does the activity vary over time by selected dimension"" set to trended, and drilldown is set to COA and drilled down on",Are there any significant unusual changes in the activity over time by GL account?,"Yes, there are multiple GL Accounts (0120001030-Various income, 0120700300-Utilization of provision for future risks and charges, 0120700500-Prior year listing, 0120700600-Prior year promo) that have significant unusual changes period over period.",,,,,,,,,
+Date Analysis,Complex,"Analysis period 2024, comparative period 2023, account type revenue, day of week analysis","Based on the day of week analysis, are there any  are there any unexpected changes in the timing or pattern of journal entries posted on certain days of the week?","Yes, there are multiple days in the period with significant changes year-over-year, including a significant increase in revenue activity recorded on Thursday, and a significant decrease in revenue activity recorded on Saturday.",,,,,,,,,
+Understanding the impact of change,Complex,"Analysis period 2024, comparative period 2023, account type revenue, change by dimension","Are there any indications that a process may no longer be relevant in the analysis period based on TE set at 150,000,000?","Yes, the S/A GL account document source changed by 41,614,112, with only (132,350,860) recorded in the current analysis period.",,,,,,,,,
+Relationship analysis (bar graph),Simple,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Relationship type: Relationship analysis
+Primary account: Assets
+Secondary account: Liabilities",In which periods is the secondary account value higher than the primary account value?,"2023: Periods 4, 6, 8, 11
+2024: Periods 1, 2, 8, 10 and 12",,,,,,,,,
+Relationship analysis (Table),Simple,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Relationship type: Relationship analysis
+Primary account: Assets
+Secondary account: Liabilities",Which period shows the highest relationship percentage in the current year?,Period: 5,,,,,,,,,
+Relationship analysis,Medium,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Relationship type: Margin analysis
+Primary account: Revenue
+Secondary account: Expenses",Which individual period is the greatest anomaly compared to the others? ,Period: 12,,,,,,,,,
+Process understanding,Simple,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Account class: Sales of goods and services",By what percentage did the number of journal entries increase or decrease in the analysis period vs. the comparative period. ,-3%,,,,,,,,,
+Process understanding,Simple,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Account class: Sales of goods and services",What is the most material Source for the selected account and what is it's value? ," Source: Sales
+Value: $10,301,188,719 (Credit) ",,,,,,,,,
+Process understanding,Simple,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Account class: Sales of goods and services",List the material (absolute value over $30M) Sources for the selected account. ,"Sources Over $30M
+1.	Sales
+o	Amount: $10,301,188,719 (Credit)
+2.	Sales Adjustments
+o	Amount: $570,890,205 (Mixed Debit/Credit)
+3.	Sales Manual
+o	Amount: $153,521,980 (Credit)
+4.	Sales Accruals
+o	Amount: $71,595,909 (Debit)
+5.	Fixed Assets
+o	Amount: $130,249,392 (Debit)",,,,,,,,,
+Process understanding,Medium,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Account class: Sales of goods and services",Are there any material (absolute value over $30M) non-recurring Sources across periods? ,"Sales Accruals:
+$71.6M
+Fixed Assets:
+$130.2M",,,,,,,,,
+Relationship analysis,Complex,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Relationship type: Relationship analysis
+Primary account: Assets
+Secondary account: Liabilities","Based on the trend in relationship percentage across months, where should I conclude my inherent risk to be for revenue?","The relationship percentage fluctuates significantly across months, with sharp peaks and troughs. According to EY’s audit methodology, such volatility in revenue-linked metrics suggests inconsistent recognition patterns. Therefore, inherent risk for revenue should be assessed as high, especially if the fluctuations align with quarter-end or year-end periods. This warrants expanded substantive testing and a review of revenue cutoff procedures.",,,,,,,,,
+Relationship analysis - Bar chart comparing Primary vs Secondary values,Complex,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Relationship type: Relationship analysis
+Primary account: Assets
+Secondary account: Liabilities","If the relationship between primary and secondary values fluctuates significantly in multiple months, what control risk implications should I consider?","When secondary values consistently exceed primary values, it may indicate that downstream processes (e.g., adjustments, reclassifications) are driving financial outcomes more than original entries. EY’s methodology flags this as a control risk, suggesting potential override of source controls or lack of review. The audit team should assess whether secondary entries are properly authorized and supported, and whether segregation of duties is maintained.",,,,,,,,,
+Process understanding,Complex,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Account class: Sales of goods and services",Recommend an inherent risk assessment for the selected account. ,"________________________________________
+?? Dashboard Highlights
+•	Account Type: Sales of goods and services
+•	Total Activity:
+o	Debit: \$7.3B
+o	Credit: \$17.0B
+o	Net Change: –\$9.7B
+•	Journal Entries:
+o	Total JEs: 79,000 (? 3% from prior period)
+o	Level 1 Fingerprints: 80 (? 9%)
+o	Level 2 Fingerprints: 21 (? 19%)
+•	Sources & Preparers:
+o	27 sources (? 8%)
+o	13 preparers (no change)
+•	Key Source Groups: Finance & Admin, IT, System
+•	Significant Entries:
+o	Large negative entries in Sales and Receivables adjustments
+o	High volume of Sales adjustments and Sales manual entries
+________________________________________
+?? Inherent Risk Assessment
+Based on the above, the selected account exhibits moderate to high inherent risk due to the following factors:
+1. High Volume and Value of Transactions
+•	The account shows a net credit of –\$9.7B, indicating substantial revenue activity.
+•	High transaction volume (79,000 JEs) increases the risk of errors or irregularities.
+2. Manual Adjustments
+•	Significant manual entries (–\$153M) and adjustments (\$571M) suggest potential for override or manipulation.
+•	Manual entries are often less controlled and more prone to error or fraud.
+3. Decline in Fingerprint Diversity
+•	A drop in Level 1 and Level 2 JE fingerprints may indicate reduced variability in posting patterns, which could signal automation or consolidation—but also raises concerns about lack of segregation or oversight.
+4. Multiple Source Systems
+•	With 27 sources contributing, integration and consistency risks are elevated.
+•	Disparate systems may lead to reconciliation issues or data integrity concerns.
+5. Receivables Adjustments
+•	Large negative adjustments (–\$17.8M) in receivables could reflect aggressive revenue recognition or write-offs.
+________________________________________
+? Recommendations
+•	Perform targeted testing on manual and adjustment entries.
+•	Review source system mappings and reconciliations for completeness and accuracy.
+•	Analyze fingerprint trends to understand changes in posting behavior.
+•	Validate cutoff procedures to ensure revenue is recognized in the correct period.
+•	Assess segregation of duties across preparers and approvers.
+",,,,,,,,,
+Segregation of duties,Complex,"Global slicers on landing page: 
+Analysis currency: ""Reporting""
+Analysis period: 2024
+Comparative period: 2023
+
+Page slicers:
+Primary account: Revenue
+Secondary account: Expenses",What conclusions can be drawn about segregation of duties if there are preparers that post to both accounts?,"When a preparer posts to both accounts—especially if those accounts represent conflicting roles (e.g., revenue and receivables, or cash and payables)—it introduces a segregation of duties violation, which undermines internal controls. The foundational principle of SoD is that no single individual should control all aspects of a financial transaction, including initiation, authorization, recording, and reconciliation.",,,,,,,,,
